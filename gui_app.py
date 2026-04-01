@@ -59,21 +59,33 @@ def analyze():
     strength = get_strength(password)
     entropy = calculate_entropy(password)
 
-    result.set(f"Strength: {strength}\nEntropy: {entropy}")
+    result_label.config(text=f"Strength: {strength}\nEntropy: {entropy}")
 
-# GUI window
+    # Color feedback
+    if strength == "Weak":
+        result_label.config(fg="red")
+    elif strength == "Medium":
+        result_label.config(fg="orange")
+    else:
+        result_label.config(fg="green")
+
+# Window
 root = tk.Tk()
 root.title("Password Strength Analyzer")
-root.geometry("350x200")
+root.geometry("400x300")
+root.configure(bg="#f0f0f0")
 
-tk.Label(root, text="Enter Password:", font=("Arial", 12)).pack(pady=10)
+frame = tk.Frame(root, bg="#f0f0f0")
+frame.pack(expand=True)
 
-entry = tk.Entry(root, show="*", width=30)
-entry.pack()
+tk.Label(frame, text="Enter Password", font=("Arial", 16), bg="#f0f0f0").pack(pady=10)
 
-tk.Button(root, text="Analyze", command=analyze).pack(pady=10)
+entry = tk.Entry(frame, show="*", width=30, font=("Arial", 12))
+entry.pack(pady=5)
 
-result = tk.StringVar()
-tk.Label(root, textvariable=result, font=("Arial", 12)).pack(pady=10)
+tk.Button(frame, text="Analyze", command=analyze, font=("Arial", 12), bg="#4CAF50", fg="white").pack(pady=10)
+
+result_label = tk.Label(frame, text="", font=("Arial", 14), bg="#f0f0f0")
+result_label.pack(pady=10)
 
 root.mainloop()
