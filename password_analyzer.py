@@ -1,132 +1,149 @@
 import re
 import math
 
-# Common weak passwords list for basic validation
-COMMON_PASSWORDS = [
+COMMON_PASSWORDS = {
     "password", "123456", "123456789", "qwerty", "abc123", "password123"
-]
+}
 
-# Check if password length is at least 8 characters
-def check_length(password):
-    return len(password) >= 8
+SPECIAL_CHAR_PATTERN = r'[!@#$%^&*(),.?":{}|<>]'
 
-# Check for uppercase letters
-def check_uppercase(password):
-    return any(char.isupper() for char in password)
 
-# Check for lowercase letters
-def check_lowercase(password):
-    return any(char.islower() for char in password)
+def has_upper(password):
+    return any(c.isupper() for c in password)
 
-# Check for numeric digits
-def check_digits(password):
-    return any(char.isdigit() for char in password)
 
-# Check for special characters using regex
-def check_special_chars(password):
-    return bool(re.search(r'[!@#$%^&*(),.?":{}|<>]', password))
+def has_lower(password):
+    return any(c.islower() for c in password)
 
-# Check if password is commonly used
-def check_common(password):
+
+def has_digit(password):
+    return any(c.isdigit() for c in password)
+
+
+def has_special(password):
+    return bool(re.search(SPECIAL_CHAR_PATTERN, password))
+
+
+def is_common(password):
     return password.lower() in COMMON_PASSWORDS
 
-# Calculate entropy based on character set size and length
+
 def calculate_entropy(password):
     charset = 0
 
-    if any(c.islower() for c in password):
+    if has_lower(password):
         charset += 26
-    if any(c.isupper() for c in password):
+    if has_upper(password):
         charset += 26
-    if any(c.isdigit() for c in password):
+    if has_digit(password):
         charset += 10
-    if re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+    if has_special(password):
         charset += 32
 
     if charset == 0:
-        return 0
+        return 0.0
 
-    entropy = len(password) * math.log2(charset)
-    return round(entropy, 2)
+    return round(len(password) * math.log2(charset), 2)
 
-# Generate suggestions to improve weak passwords
-def give_suggestions(password):
-    suggestions = []
 
-    if len(password) < 8:
-        suggestions.append("Increase password length to at least 8 characters")
-    if not any(char.isupper() for char in password):
-        suggestions.append("Add uppercase letters")
-    if not any(char.islower() for char in password):
-        suggestions.append("Add lowercase letters")
-    if not any(char.isdigit() for char in password):
-        suggestions.append("Include numbers")
-    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
-        suggestions.append("Include special characters")
-
-    return suggestions
-
-# Assign score based on password properties
 def calculate_score(password):
     score = 0
 
-    if check_length(password):
+    if len(password) >= 8:
         score += 2
-    if check_uppercase(password):
+    if has_upper(password):
         score += 1
-    if check_lowercase(password):
+    if has_lower(password):
         score += 1
-    if check_digits(password):
+    if has_digit(password):
         score += 1
-    if check_special_chars(password):
+    if has_special(password):
         score += 2
-    if not check_common(password):
-        score += 2
-    else:
+
+    if is_common(password):
         score -= 2
+    else:
+        score += 2
 
     return score
 
-# Convert score into strength category
+
 def get_strength(score):
     if score <= 2:
         return "Weak"
-    elif 3 <= score <= 5:
+    elif score <= 5:
         return "Medium"
-    else:
-        return "Strong"
+    return "Strong"
 
-# Main analysis function
+
+def generate_suggestions(password):
+    suggestions = []
+
+    if len(password) < 8:
+        suggestions.append("Increase length to at least 8 characters")
+    if not has_upper(password):
+        suggestions.append("Add uppercase letters")
+    if not has_lower(password):
+        suggestions.append("Add lowercase letters")
+    if not has_digit(password):
+        suggestions.append("Include numbers")
+    if not has_special(password):
+        suggestions.append("Include special characters")
+    if is_common(password):
+        suggestions.append("Avoid common passwords")
+
+    return suggestions
+
+
 def analyze_password(password):
-    print("\nPassword Analysis:")
-    print("----------------------")
-
-    print("Length OK:", check_length(password))
-    print("Has Uppercase:", check_uppercase(password))
-    print("Has Lowercase:", check_lowercase(password))
-    print("Has Digits:", check_digits(password))
-    print("Has Special Characters:", check_special_chars(password))
-    print("Is Common Password:", check_common(password))
+    if not password:
+        return {"error": "Password cannot be empty"}
 
     score = calculate_score(password)
-    strength = get_strength(score)
     entropy = calculate_entropy(password)
-    suggestions = give_suggestions(password)
+    strength = get_strength(score)
+    suggestions = generate_suggestions(password)
 
-    print("\nScore:", score)
-    print("Strength:", strength)
-    print("Entropy:", entropy)
+    return {
+        "length_valid": len(password) >= 8,
+        "has_upper": has_upper(password),
+        "has_lower": has_lower(password),
+        "has_digit": has_digit(password),
+        "has_special": has_special(password),
+        "is_common": is_common(password),
+        "score": score,
+        "strength": strength,
+        "entropy": entropy,
+        "suggestions": suggestions
+    }
 
-    if suggestions:
-        print("\nSuggestions to improve:")
-        for s in suggestions:
+
+def display_result(result):
+    if "error" in result:
+        print(result["error"])
+        return
+
+    print("\nPassword Analysis")
+    print("----------------------")
+
+    print("Length OK:", result["length_valid"])
+    print("Has Uppercase:", result["has_upper"])
+    print("Has Lowercase:", result["has_lower"])
+    print("Has Digits:", result["has_digit"])
+    print("Has Special Characters:", result["has_special"])
+    print("Is Common Password:", result["is_common"])
+
+    print("\nScore:", result["score"])
+    print("Strength:", result["strength"])
+    print("Entropy:", result["entropy"])
+
+    if result["suggestions"]:
+        print("\nSuggestions:")
+        for s in result["suggestions"]:
             print("-", s)
 
-# Entry point of the program
-if __name__ == "__main__":
-    password = input("Enter a password to analyze: ")
 
-    if not password:
-        print("Password cannot be empty!")
-    else:
-        analyze_password(password)
+if __name__ == "__main__":
+    password = input("Enter a password to analyze: ").strip()
+    result = analyze_password(password)
+    display_result(result)
