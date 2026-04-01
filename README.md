@@ -1,28 +1,60 @@
-# Password Strength Analyzer
+Password Strength Analyzer
 
-## Overview
-This is a Python-based password strength analyzer that evaluates password security using rule-based checks.
+Overview
 
-## Features
-- Checks password length
-- Detects uppercase and lowercase letters
+This project is a Python-based password strength analyzer that evaluates the security of a password using rule-based checks and entropy calculation.
+
+Features
+
+- Validates password length
+- Detects uppercase and lowercase characters
 - Identifies digits and special characters
-- Detects common weak passwords
-- Provides strength rating (Weak, Medium, Strong)
+- Checks against common weak passwords
+- Calculates password strength (Weak, Medium, Strong)
+- Computes entropy for security estimation
+- Provides suggestions to improve weak passwords
 
-## Usage
-Run the program:
+How It Works
+
+The program analyzes a password based on multiple criteria such as length, character diversity, and common patterns. It assigns a score, calculates entropy, and determines the overall strength.
+
+Usage
+
+Run the program using:
 
 python password_checker.py
 
-## Example
-Input: Hello@123  
-Output: Strong
+Enter a password when prompted to see the analysis.
 
-## Technologies Used
+Example
+
+Input:
+Hello123
+
+Output:
+Strength: Medium
+Entropy: (value shown)
+Suggestions:
+
+- Add special characters
+
+Technologies Used
+
 - Python
 
-## Future Improvements 
-- Add entropy calculation
-- Improve scoring logic
-- Build GUI interface
+Project Structure
+
+password-strength-analyzer/
+│
+├── password_checker.py
+└── README.md
+
+Future Improvements
+
+- Add graphical user interface (GUI)
+- Integrate password breach detection
+- Improve scoring algorithm using advanced techniques
+
+Author
+
+ShriNandhan
