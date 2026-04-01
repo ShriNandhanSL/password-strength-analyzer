@@ -22,7 +22,7 @@ Output: Strong
 ## Technologies Used
 - Python
 
-## Future Improvements
+## Future Improvements 
 - Add entropy calculation
 - Improve scoring logic
 - Build GUI interface
